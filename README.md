@@ -1,6 +1,6 @@
 # Infraestrutura Web na AWS com Monitoramento Automatizado 
 
-Este projeto foi desenvolvido como parte de um programa de bolsas em DevSecOps e tem como objetivo principal levantar uma infraestrutura web básica, segura e funcional na Amazon Web Services (AWS), garantindo a disponibilidade contínua de um website. A solução inclui a configuração de rede, a implantação de um servidor web (Nginx) para hospedar uma página HTML, e a implementação de um sistema de monitoramento automatizado com alertas. 
+Este projeto foi desenvolvido como parte do programa de bolsas em Cloud & DevSecOps, da empresa Compass UOL, e tem como objetivo principal levantar uma infraestrutura web básica, segura e funcional na Amazon Web Services (AWS), garantindo a disponibilidade contínua de um website. A solução inclui a configuração de rede, a implantação de um servidor web (Nginx) para hospedar uma página HTML, e a implementação de um sistema de monitoramento automatizado com alertas. 
 
 ## Tecnologias Utilizadas
 
@@ -34,6 +34,8 @@ Este projeto foi desenvolvido como parte de um programa de bolsas em DevSecOps e
 * **Criação de Sub-redes**: Dentro da VPC "projeto-Linux", foram configuradas as seguintes sub-redes:
     * Duas sub-redes públicas: `subrede-publica01` e `subrede-publica02`.
     * Duas sub-redes privadas: `subrede-privada01` e `subrede-privada02`.
+* **Criação do Internet Gateway (ig-projetoLinux)**: Um Internet Gateway foi criado e anexado à VPC "projeto-Linux". O ig-projetoLinux permite a comunicação entre a VPC e a internet.
+* **Criação da tabela de rotas pública (minha-rt-publica)**: Uma tabela de rotas foi criada e associada às sub-redes públicas (subrede-publica01 e subrede-publica02). Uma rota padrão (0.0.0.0/0) foi adicionada, apontando para o Internet Gateway, permitindo que o tráfego de saída dessas sub-redes alcance a internet.
 
 ### 1.2. Configuração da Instância EC2 na AWS Console
 
@@ -280,6 +282,70 @@ verificar_site
 ```
 chmod +x ~/site_monitor.sh
 ```
+
+### 3.3. Teste Manual do Script de Monitoramento
+
+Para verificar a funcionalidade do script antes de agendá-lo:
+
+* **Execução do script**:
+```
+bash ~/site_monitor.sh
+```
+
+* **Verificar o arquivo de log**:
+```
+cat /var/log/monitoramento/site_monitor.log
+```
+
+* **Saída**:
+<img width="2716" height="1136" alt="image" src="https://github.com/user-attachments/assets/a1bc7341-f1e5-440c-acce-ebe003e575d9" />
+
+* **Para simular uma falha e testar a notificação no Discord, pode-se temporariamente parar o Nginx e executar o script**:
+```
+sudo systemctl stop nginx
+```
+
+* **Monitorar o log do script em tempo real (últimas linhas)**:
+```
+tail -f /var/log/monitoramento/site_monitor.log
+```
+* **Saída**:
+<img width="3680" height="1136" alt="image" src="https://github.com/user-attachments/assets/c56849ac-43cc-42cc-91d9-609ce3fedd88" />
+
+* **Discord**:
+<p align="center">
+  <img width="882" height="66" alt="Sem título" src="https://github.com/user-attachments/assets/3cfa1751-d023-428b-b6a3-2306ddd5d631" />
+</p>
+
+* **Reiniciar o Nginx após o teste**:
+```
+sudo systemctl start nginx
+```
+
+### 3.4. Agendamento do Script com cron
+Para que o script de monitoramento seja executado automaticamente a cada 1 minuto:
+
+* **Abrir o crontab para edição**:
+```
+crontab -e
+```
+
+* **Adicionar a linha de agendamento no final do arquivo**:
+```
+* * * * * /bin/bash /home/ubuntu/site_monitor.sh >> /home/ubuntu/monitor_cron.log 2>&1
+```
+   * (* * * * *): Configura a execução a cada minuto.
+
+   * /bin/bash: Caminho para o interpretador Bash.
+
+   * /home/ubuntu/site_monitor.sh: Caminho completo do script.
+
+   *  (>>) /home/ubuntu/monitor_cron.log 2>&1: Redireciona a saída padrão e de erro do cron para um arquivo de log específico, útil para depuração do próprio agendamento.
+
+
+* **Salvar e sair do nano pressionando Ctrl + X, Y, Enter**:
+
+  
 
 
 
