@@ -1,6 +1,6 @@
 # Infraestrutura Web na AWS com Monitoramento Automatizado 
 
-Este projeto foi desenvolvido como parte do programa de bolsas em Cloud & DevSecOps, da empresa Compass UOL, e tem como objetivo principal levantar uma infraestrutura web básica, segura e funcional na Amazon Web Services (AWS), garantindo a disponibilidade contínua de um website. A solução inclui a configuração de rede, a implantação de um servidor web (Nginx) para hospedar uma página HTML, e a implementação de um sistema de monitoramento automatizado com alertas. 
+Este projeto foi desenvolvido como parte do programa de bolsas em Cloud & DevSecOps da Compass UOL, com o objetivo de implementar uma infraestrutura web na Amazon Web Services (AWS) que seja básica, segura e funcional. A proposta contempla a criação da estrutura de rede, a configuração de um servidor web (Nginx) para hospedagem de uma página HTML e a implementação de um sistema de monitoramento automatizado com envio de alertas, assegurando a disponibilidade contínua do site.
 
 ## Tecnologias Utilizadas
 
