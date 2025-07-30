@@ -42,7 +42,7 @@ Este projeto foi desenvolvido como parte do programa de bolsas em Cloud & DevSec
 * **Lançamento da Instância EC2**: Uma instância EC2 (distribuição Ubuntu 24.04 LTS) foi lançada **na `subrede-publica01`** através do console da AWS.
 * **Geração e Salvamento da Chave SSH**: Durante o processo de lançamento, um novo par de chaves SSH (`projetoLinux.pem`) foi gerado e salvo localmente para permitir acesso seguro à instância via SSH.
 * **Configuração do Grupo de Segurança (MeuGrupoDeSegurança)**: Um novo Grupo de Segurança foi criado e configurado com as seguintes regras de entrada (`Inbound Rules`):
-    * **SSH (Porta TCP 22)**: Permitido para o endereço IP `<IP_AUTORIZADO_LOCAL>/32` (ex: `143.202.111.53/32` no formato CIDR).
+    * **SSH (Porta TCP 22)**: Permitido para o endereço IP `<IP_AUTORIZADO_LOCAL>/32` (ex: `123.456.111.22/32` no formato CIDR).
     * **HTTP (Porta TCP 80)**: Permitido para `0.0.0.0/0` (acesso de qualquer IP na internet).
     * As regras de saída (`Outbound Rules`) foram mantidas como padrão (permitindo todo o tráfego para `0.0.0.0/0`).
 * **Associação do Grupo de Segurança à Instância**: O Grupo de Segurança criado (`MeuGrupoDeSegurança`) foi associado à instância EC2, garantindo que as regras de firewall definidas fossem aplicadas corretamente ao tráfego de rede da instância.
@@ -98,7 +98,7 @@ cd /mnt/c/Users/Usuario/Documentos/
 ```
 * **Copiar o diretório do projeto para a instância EC2 usando scp**:
 ```
-scp -i <CAMINHO_DA_CHAVE>/chave.pem -r nome-da-pasta-da-pagina ubuntu@<IP_PUBLICO_DA_INSTANCIA>:/tmp/
+scp -i <CAMINHO_DA_CHAVE>/chave.pem -r nome-da-pasta-da-pagina ubuntu@<IP_PUBLICO_DA_EC2>:/tmp/
 ```
 * Este comando copia recursivamente (-r) toda a pasta nome-da-pasta-da-pagina para o diretório temporário /tmp/ na instância EC2.
 
@@ -210,7 +210,7 @@ nano ~/site_monitor.sh
 
 * **Definição de Variáveis**:
 ```
-SITE_URL="http://<IP_PUBLICO_DA_INSTANCIA>/" 
+SITE_URL="http://<IP_PUBLICO_DA_EC2>/" 
 TIMEOUT_SECONDS=10
 ```
   * SITE_URL: URL que será monitorada.
@@ -223,7 +223,7 @@ LOG_FILE="${LOG_DIR}/site_monitor.log"
   * Diretório e nome do arquivo onde os registros serão salvos.
 
 ```
-WEBHOOK_DISCORD="https://discordapp.com/api/webhooks/WEBHOOK"
+WEBHOOK_DISCORD="https://discordapp.com/api/webhooks/<WEBHOOK>"
 ```
   * URL do webhook usado para enviar alertas ao Discord. Esse valor deve ser obtido nas configurações de integração do canal no Discord.
 
@@ -298,7 +298,7 @@ cat /var/log/monitoramento/site_monitor.log
 ```
 
 * **Saída**:
-<img width="2716" height="1136" alt="image" src="https://github.com/user-attachments/assets/a1bc7341-f1e5-440c-acce-ebe003e575d9" />
+<img width="2716" height="912" alt="image" src="https://github.com/user-attachments/assets/4c4bf364-2913-415d-8cef-55a7c10ad9d9" />
 
 * **Para simular uma falha e testar a notificação no Discord, pode-se temporariamente parar o Nginx e executar o script**:
 ```
@@ -343,9 +343,42 @@ crontab -e
    *  (>>) /home/ubuntu/monitor_cron.log 2>&1: Redireciona a saída padrão e de erro do cron para um arquivo de log específico, útil para depuração do próprio agendamento.
 
 
-* **Salvar e sair do nano pressionando Ctrl + X, Y, Enter**:
+* **Salvar e sair do nano pressionando Ctrl + X, Y, Enter**.
 
+
+* **Abrir novamente o log do script em tempo real (últimas linhas)**:
+```
+tail -f /var/log/monitoramento/site_monitor.log
+```
+* **Saída**:
+<img width="2716" height="1316" alt="image" src="https://github.com/user-attachments/assets/ac4a10d5-8dca-4998-a321-35bb598539e7" />
+
+* **Agora, pode-se notar que o log é atualizado de minuto em minuto, que era o esperado**.
+
+* **Para verificar o arquivo monitor_cron.log em tempo real usa-se o comando**:
+```
+tail -f /home/ubuntu/monitor_cron.log
+```
+* **A saída será parecida com a saída do site_monitor.log**
+
+
+## ⚠️ Informações importantes sobre a aplicação
+
+* Esta documentação usa placeholders como **`<IP_PUBLICO_DA_EC2>`**, **`<CAMINHO_DA_CHAVE>`** e **`<IP_AUTORIZADO_LOCAL>`** para proteger informações sensíveis. Substitua-os pelos valores reais do seu ambiente ao executar os comandos. Exemplos como `123.456.111.22/32` são **fictícios** e servem apenas para ilustrar o formato CIDR.
+
+* Verifique os caminhos utilizados nos comandos. Eles podem variar conforme a estrutura do seu sistema.
+
+* **Sempre que a instância EC2 for parada e reiniciada, um novo IP público será atribuído automaticamente. Isso exige atualização manual em alguns pontos:**
   
+*   Acesso via SSH: atualize o IP no comando de conexão:
+```
+ssh -i <CAMINHO_DA_CHAVE>/projetoLinux.pem ubuntu@<NOVO_IP_PUBLICO_DA_EC2>
+```
+
+*   Script de monitoramento: atualize a URL no campo SITE_URL dentro do script:
+```
+SITE_URL="http://<NOVO_IP_PUBLICO_DA_EC2>/"
+```
 
 
 
