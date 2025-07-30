@@ -380,6 +380,9 @@ ssh -i <CAMINHO_DA_CHAVE>/projetoLinux.pem ubuntu@<NOVO_IP_PUBLICO_DA_EC2>
 SITE_URL="http://<NOVO_IP_PUBLICO_DA_EC2>/"
 ```
 
+Seguindo todos os passos descritos ao longo desta documentação, é possível garantir que a aplicação esteja disponível 24 horas por dia, com notificações imediatas em caso de falhas.
+
+A estrutura criada também proporciona uma base sólida para escalabilidade futura, permitindo evoluções como o uso de User Data, templates com CloudFormation e gerenciamento centralizado com Terraform.
 
 
 
